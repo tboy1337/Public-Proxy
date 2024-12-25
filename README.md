@@ -38,4 +38,4 @@ The `proxy_report.md` file is updated with the following format:
 
 | Proxy           | Type    | Response Time (s) | Anonymity       |
 |-----------------|---------|-------------------|-----------------|
-| 162.19.107.54:34186 | HTTP    | 0.34              | High Anonymity   |
+| xxx.xxx.xxx.xxx:xxxx | HTTP    | 0.34              | High Anonymity   |
