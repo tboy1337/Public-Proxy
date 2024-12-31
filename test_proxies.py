@@ -1,47 +1,18 @@
 import requests
 from concurrent.futures import ThreadPoolExecutor
 import re
-import socket
 
 # Files containing proxies
 PROXY_FILES = ['connect.txt', 'http.txt', 'https.txt', 'socks4.txt', 'socks5.txt']
 REPORT_FILE = 'proxy_report.md'
 
-# Function to get the local machine's IP address
-def get_local_ip():
-    try:
-        # Create a socket connection to a public server (but don't send any data)
-        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
-            s.connect(("8.8.8.8", 80))  # Google's public DNS server
-            local_ip = s.getsockname()[0]
-        return local_ip
-    except Exception as e:
-        print(f"Failed to get local IP: {e}")
-    return None
-
 # Function to test a single proxy
-def test_proxy(proxy, proxy_type, target_ip):
+def test_proxy(proxy, proxy_type):
     try:
-        # Configure proxies based on type
-        if proxy_type == 'socks4':
-            proxies = {
-                "http": f"socks4://{proxy}",
-                "https": f"socks4://{proxy}",
-            }
-        elif proxy_type == 'socks5':
-            proxies = {
-                "http": f"socks5://{proxy}",
-                "https": f"socks5://{proxy}",
-            }
-        else:  # HTTP or HTTPS
-            proxies = {
-                "http": f"http://{proxy}",
-                "https": f"http://{proxy}",
-            }
-
-        # Use the local machine's IP as the target
-        response = requests.get(f"http://{target_ip}", proxies=proxies, timeout=5)
+        proxies = {"http": proxy, "https": proxy}
+        response = requests.get("https://httpbin.org/ip", proxies=proxies, timeout=5)
         if response.status_code == 200:
+            ip_info = response.json()
             anonymity = (
                 "High Anonymity"
                 if "X-Forwarded-For" not in response.headers else "Anonymous"
@@ -93,13 +64,6 @@ def generate_report(results):
 
 # Main execution
 if __name__ == "__main__":
-    print("Getting local machine's IP...")
-    local_ip = get_local_ip()
-    if not local_ip:
-        print("Failed to get local IP. Exiting.")
-        exit(1)
-    print(f"Local IP: {local_ip}")
-
     print("Loading proxies...")
     proxies = load_proxies()
     if not proxies:
@@ -110,7 +74,7 @@ if __name__ == "__main__":
     results = []
     print("Testing proxies...")
     with ThreadPoolExecutor(max_workers=100) as executor:
-        for proxy_result in executor.map(lambda p: test_proxy(p[0], p[1], local_ip), proxies):
+        for proxy_result in executor.map(lambda p: test_proxy(*p), proxies):
             if proxy_result:
                 results.append(proxy_result)
     
