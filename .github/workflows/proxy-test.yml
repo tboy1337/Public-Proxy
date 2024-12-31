@@ -40,13 +40,8 @@ jobs:
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
-          git add proxy_reports/connect_proxies.md
-          git add proxy_reports/http_proxies.md
-          git add proxy_reports/https_proxies.md
-          git add proxy_reports/socks4_proxies.md
-          git add proxy_reports/socks5_proxies.md
-          git add proxy_reports/summary.md
-          git commit -m "Update proxy reports"
+          git add proxy_report.md
+          git commit -m "Update proxy report"
           git push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
